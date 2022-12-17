@@ -1,9 +1,9 @@
 import { formattedDate } from "../__tests__/index.test"
 
 interface Streak {
-    currentCount: number
-    startDate: string
-    lastLoginDate: string
+  currentCount: number
+  startDate: string
+  lastLoginDate: string
 }
 
 function differenceInDays(dateLeft: Date, dateRight: Date): number {
@@ -14,51 +14,71 @@ function differenceInDays(dateLeft: Date, dateRight: Date): number {
 }
 
 function shouldIncrementOrResetStreakCount(
-   currentDate: Date,
-   lastLoginDate: string
- ): "increment" | undefined   {
-   // We get 11/5/2021
-   // so to get 5, we use our helper function
-   const difference = differenceInDays(currentDate, new Date(lastLoginDate));
-    // This means they logged in the day after the currentDate
-   if (difference === 1) {
-     return "increment"
-   }
-    // Otherwise they logged in after a day, which would
-   // break the streak
-   return undefined 
- }
+  currentDate: Date,
+  lastLoginDate: string
+): "increment" | "none" | "reset" {
+  // We get 11/5/2021
+  // so to get 5, we use our helper function
+  const difference = differenceInDays(currentDate, new Date(lastLoginDate));
+  if (difference === 0) {
+    return "none"
+  }
+  // This means they logged in the day after the currentDate
+  if (difference === 1) {
+    return "increment"
+  }
+
+  // Otherwise they logged in after a day, which would
+  // break the streak
+  return "reset"
+}
 
 export function streakCounter(_localStorage: Storage, date: Date): Streak {
-    const streakInLocalStorage = _localStorage.getItem("streak");
-    if (streakInLocalStorage) {
-      try {
-        const streak = JSON.parse(streakInLocalStorage || "") as Streak
-        const SHOULD_INCREMENT = shouldIncrementOrResetStreakCount(date, streak.lastLoginDate)
+  const streakInLocalStorage = _localStorage.getItem("streak");
+  if (streakInLocalStorage) {
+    try {
+      const streak = JSON.parse(streakInLocalStorage || "") as Streak
+      const STATE = shouldIncrementOrResetStreakCount(date, streak.lastLoginDate)
+      console.log(STATE, "what are you")
 
-        if (SHOULD_INCREMENT === 'increment') {
-          const updatedStreak: Streak = {
-            ...streak,
-            currentCount: streak.currentCount += 1
-          }
-          _localStorage.setItem("streak", JSON.stringify(updatedStreak));
-
-          return updatedStreak
+      if (STATE === 'increment') {
+        const updatedStreak: Streak = {
+          ...streak,
+          currentCount: streak.currentCount += 1
         }
+        _localStorage.setItem("streak", JSON.stringify(updatedStreak));
 
-        return streak;
-      } catch (error) {
-        console.error("Failed to parse streak from localStorage");
+        return updatedStreak
       }
+
+      if (STATE === 'reset') {
+        const updatedStreak = {
+          currentCount: 1,
+          startDate: formattedDate(date),
+          lastLoginDate: formattedDate(date)
+        }
+        _localStorage.setItem("streak", JSON.stringify(updatedStreak));
+
+        return updatedStreak
+      }
+
+      if (STATE === 'none') {
+        return streak
+      }
+
+      return streak;
+    } catch (error) {
+      console.error("Failed to parse streak from localStorage");
     }
+  }
 
-    const streak = {
-        currentCount: 1,
-        startDate: formattedDate(date),
-        lastLoginDate: formattedDate(date)
-    }
+  const streak = {
+    currentCount: 1,
+    startDate: formattedDate(date),
+    lastLoginDate: formattedDate(date)
+  }
 
-    _localStorage.setItem("streak", JSON.stringify(streak));
+  _localStorage.setItem("streak", JSON.stringify(streak));
 
-    return streak
+  return streak
 }
