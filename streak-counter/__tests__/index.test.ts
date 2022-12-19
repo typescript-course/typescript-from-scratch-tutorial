@@ -2,10 +2,7 @@ import {describe, it, expect, beforeEach, afterEach} from "vitest"
 
 import { JSDOM } from "jsdom";
 import { streakCounter } from "../src/index";
-
-export function formattedDate(date: Date): string {
-  return date.toLocaleDateString("en-US");
-}
+import { formattedDate, STREAK_KEY } from "../src/lib";
 
 describe("streakCounter", () => {
   let mockLocalStorage: Storage;
@@ -39,7 +36,7 @@ describe("streakCounter", () => {
   });
   it("should store the streak in localStorage", () => {
     const date = new Date();
-    const key = "streak";
+    const key = STREAK_KEY;
     streakCounter(mockLocalStorage, date);
 
     const streakAsString = mockLocalStorage.getItem(key);
@@ -63,7 +60,7 @@ describe("streakCounter", () => {
         lastLoginDate: formattedDate(date),
       };
 
-      mockLocalStorage.setItem("streak", JSON.stringify(streak));
+      mockLocalStorage.setItem(STREAK_KEY, JSON.stringify(streak));
     });
     afterEach(() => {
       mockLocalStorage.clear();
@@ -92,7 +89,7 @@ describe("streakCounter", () => {
       expect(streak.currentCount).toBe(1);
     });
     it("should save the incremented streak to localStorage", () => {
-      const key = "streak";
+      const key = STREAK_KEY;
       const date = new Date("12/13/2021");
       // Call it once so it updates the streak
       streakCounter(mockLocalStorage, date);
@@ -124,7 +121,7 @@ describe("streakCounter", () => {
       expect(streakUpdated.currentCount).toBe(1);
     });
     it("should save the reset streak to localStorage", () => {
-      const key = "streak";
+      const key = STREAK_KEY;
       const date = new Date("12/13/2021");
       // Call it once so it updates the streak
       streakCounter(mockLocalStorage, date);
