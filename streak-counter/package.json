@@ -1,6 +1,6 @@
 {
   "name": "@jsjoeio/streak-counter-2",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a streak counter inspired by Duolingo",
   "repository": {
     "type": "git",
