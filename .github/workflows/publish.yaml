@@ -1,0 +1,22 @@
+on: push
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: streak-counter
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+      - run: npm i -g pnpm
+      - run: pnpm install
+      - run: pnpm test
+      - run: pnpm build
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./streak-counter/package.json
+          access: public
