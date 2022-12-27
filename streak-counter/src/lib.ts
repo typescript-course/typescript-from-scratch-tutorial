@@ -8,6 +8,9 @@ export function differenceInDays(dateLeft: Date, dateRight: Date): number {
   return differenceInDays;
 }
 
+// Source: https://stackoverflow.com/a/65225615/3015595
+const diff = (from: string, to: string) => Math.floor((new Date(from).getTime() - new Date(to).getTime()) / 86400000);
+
 export function formattedDate(date: Date): string {
   return date.toLocaleDateString("en-US");
 }
@@ -18,7 +21,7 @@ export function shouldIncrementOrResetStreakCount(
 ): "increment" | "none" | "reset" {
   // We get 11/5/2021
   // so to get 5, we use our helper function
-  const difference = differenceInDays(currentDate, new Date(lastLoginDate));
+  const difference = diff(currentDate.toDateString(), lastLoginDate);
   if (difference === 0) {
     return "none"
   }
